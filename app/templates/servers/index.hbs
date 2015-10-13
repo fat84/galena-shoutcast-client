@@ -1,0 +1,24 @@
+<h1 class="page-title">Servers</h1>
+<table class="servers-list">
+	<tbody>
+	{{#each model as |server|}}
+	<tr class="server">
+		<td>{{server.portBase}}</td>
+		<td>{{server.serverName}}</td>
+		<td>{{if server.isRunning "Running" "Stopped"}}</td>
+		<td>{{if server.isSourceConnected "Connected" "Disconnected"}}</td>
+		<td>
+		 {{#if server.isRunning}}
+		 <button class="btn-rotate-logs">View</button>
+		 <button class="btn-view">View</button>
+		 <button class="btn-stop">Stop</button>
+		 {{else}}
+		 <button class="btn-edit">Edit</button>
+		 <button class="btn-start">Start</button>
+		 {{/if}}
+				<button class="btn-remove">Remove</button>
+		</td>
+	</tr>
+	{{/each}}
+	</tbody>
+</table>
