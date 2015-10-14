@@ -13,7 +13,6 @@ module('Acceptance | servers/index', {
 	}
 });
 
-
 var serversData = [{
 	id: 1,
 	portBase: 8000,
@@ -29,9 +28,61 @@ var serversData = [{
 	isSourceConnected: true
 }];
 
+var serverResponses = {
+	servers: {
+		code: 200,
+		data: [{
+			id: 1,
+			portBase: 8000,
+			serverName: 'Server 1',
+			isRunning: false,
+			isSourceConnected: false
+		},
+		{
+			id: 2,
+			portBase: 9000,
+			serverName: 'Server 2',
+			isRunning: true,
+			isSourceConnected: true
+		}]	
+	},
+	serverStartSuccess: {
+		code: 200,
+		data: {
+			id: 1,
+			serverName: 'Server 1',
+			basePort: 8000,
+			isRunning: true,
+			isSourceConnected: false
+		}
+	},
+	serverStopSucess: {
+		code: 200,
+		data: {
+			id: 2,
+			serverName: 'Server 2',
+			basePort: 9000,
+			isRunning: false,
+			isSourceConnected: false
+		}
+	},
+};
+
+function setupAjaxResponse(requestUrl, type, response) {
+	$.mockjax({
+		url: requestUrl,
+		status: response.code,
+		'type': type,
+		dataType: 'json',
+		responseText: response.data
+	});
+}
+
 var button = PO.customHelper(function(selector) {
 	return {
-		click: PO.clickable(selector),
+		click: function() {
+			return click(selector);
+		},
 		exists: function() {
 			return $(selector).length > 0;
 		}
@@ -59,17 +110,9 @@ var page = PO.build({
 	})
 });
 
-function mockGetServersAjaxRequest(response) {
-	$.mockjax({
-		url: '/api/servers',
-		dataType: 'json',
-		responseText: response
-	});
-}
-
 test('Visiting /servers/index', function(assert) {
 
-	mockGetServersAjaxRequest(serversData);
+	setupAjaxResponse('/api/servers', 'GET', serverResponses.servers);
 
 	page.visit();
 
@@ -81,7 +124,7 @@ test('Visiting /servers/index', function(assert) {
 
 test('Populate servers list', function(assert) {
 
-	mockGetServersAjaxRequest(serversData);
+	setupAjaxResponse('/api/servers', 'GET', serverResponses.servers);
 
 	page.visit();
 
@@ -103,7 +146,7 @@ test('Populate servers list', function(assert) {
 
 test('Display buttons by server state', function(assert) {
 
-	mockGetServersAjaxRequest(serversData);
+	setupAjaxResponse('/api/servers', 'GET', serverResponses.servers);
 
 	page.visit();
 
@@ -127,4 +170,42 @@ test('Display buttons by server state', function(assert) {
 	});
 });
 
+test('Start server', function(assert) {
+
+	setupAjaxResponse('/api/servers/1/start', 'POST', serverResponses.serverStartSuccess);
+	setupAjaxResponse('/api/servers', 'GET', serverResponses.servers);
+
+	page.visit();
+
+	page.servers(1).btnStart().click();
+
+	andThen(function() {
+		assert.ok(page.servers(1).btnStop().exists());
+		assert.ok(page.servers(1).btnView().exists());
+		assert.ok(page.servers(1).btnRotateLogs().exists());
+		assert.ok(!page.servers(1).btnStart().exists());
+		assert.ok(!page.servers(1).btnEdit().exists());
+		assert.equal(page.servers(1).status(), 'Running');
+	});
+});
+
+test('Stop server', function(assert) {
+
+	setupAjaxResponse('/api/servers/2/stop', 'POST', serverResponses.serverStopSucess);
+	setupAjaxResponse('/api/servers', 'GET', serverResponses.servers);
+
+	page.visit();
+
+	page.servers(2).btnStop().click();
+
+	andThen(function() {
+		assert.equal(page.title(), 'Servers');
+		assert.ok(!page.servers(2).btnStop().exists());
+		assert.ok(!page.servers(2).btnView().exists());
+		assert.ok(!page.servers(2).btnRotateLogs().exists());
+		assert.ok(page.servers(2).btnStart().exists());
+		assert.ok(page.servers(2).btnEdit().exists());
+		assert.equal(page.servers(2).status(), 'Stopped');
+	});
+});
 

@@ -4,18 +4,20 @@ export default ApplicationAdapter.extend({
 
 	serverStart: function(serverId) {
 
-		return this.ajax(this.buildURL('server', serverId)+'/start', 'POST', {}).then((result) => {
-			console.log(result);
-			console.log(result);
-			console.log(result);
-			console.log(result);
-			console.log(result);
-			console.log(result);
-			console.log(result);
-			console.log(result);
-			return result;
+		return this.ajax(this.buildURL('server', serverId)+'/start', 'POST', {}).then((server) => {
+			return server;
 		});
 
 	},
+	
+
+	serverStop: function(serverId) {
+
+		return this.ajax(this.buildURL('server', serverId)+'/stop', 'POST', {}).then((server) => {
+			return server;
+		});
+
+	},
+
 	
 });

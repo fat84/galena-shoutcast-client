@@ -9,12 +9,12 @@
 		<td>{{if server.isSourceConnected "Connected" "Disconnected"}}</td>
 		<td>
 		 {{#if server.isRunning}}
-		 <button class="btn-rotate-logs">View</button>
+		 <button class="btn-rotate-logs">Rotate Logs</button>
 		 <button class="btn-view">View</button>
-		 <button class="btn-stop">Stop</button>
+		 <button class="btn-stop" {{action "serverStop" server}}>Stop</button>
 		 {{else}}
 		 <button class="btn-edit">Edit</button>
-		 <button class="btn-start">Start</button>
+		 <button class="btn-start" {{action "serverStart" server}}>Start</button>
 		 {{/if}}
 				<button class="btn-remove">Remove</button>
 		</td>
