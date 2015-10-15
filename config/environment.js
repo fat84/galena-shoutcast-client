@@ -2,7 +2,7 @@
 
 module.exports = function(environment) {
   var ENV = {
-    modulePrefix: 'galena-app',
+    modulePrefix: 'galena-shoutcast-client',
     environment: environment,
     baseURL: '/',
     locationType: 'auto',

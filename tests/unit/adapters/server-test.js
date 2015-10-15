@@ -1,57 +1,16 @@
 import { moduleFor, test } from 'ember-qunit';
+import startMirage from '../../helpers/setup-mirage-for-integration';
 
 moduleFor('adapter:server', 'Unit | Adapter | server', {
 	// Specify the other units that are required for this test.
 	// needs: ['serializer:foo']
+	integration: true,
+	setup: function() {
+		startMirage(this.container);
+	}
 });
 
-var serverResponses = {
-	serverStartSuccess: {
-		code: 200,
-		data: {
-			id: 1,
-			serverName: 'Test',
-			basePort: 8000,
-			isRunning: true,
-			isSourceConnected: false
-		}
-	},
-	serverStopSucess: {
-		code: 200,
-		data: {
-			id: 1,
-			serverName: 'Test',
-			basePort: 8000,
-			isRunning: false,
-			isSourceConnected: false
-		}
-	},
-	serverStartError: {
-		code: 400,
-		data: {
-			errors: [{ message: "Can't start the server" }]
-		}
-	},
-	serverStopError: {
-		code: 400,
-		data: {
-			errors: [{ message: "Can't stop the server" }]
-		}
-	},
-};
 
-function setupAjaxResponse(requestUrl, type, response) {
-	$.mockjax.clear();
-	$.mockjax({
-		url: requestUrl,
-		status: response.code,
-		'type': type,
-		dataType: 'json',
-		responseText: response.data
-	});
-}
-
-// Replace this with your real tests.
 test('it exists', function(assert) {
 	var adapter = this.subject();
 	assert.ok(adapter);
@@ -61,27 +20,27 @@ test('it exists', function(assert) {
 test('start server success', function(assert) {
 	var adapter = this.subject();
 
-	setupAjaxResponse('/api/servers/1/start', 'POST', serverResponses.serverStartSuccess);
-
 	return adapter.serverStart(1).then((result) => {
 		assert.ok(result);
-		assert.deepEqual(result, serverResponses.serverStartSuccess.data);
+		assert.deepEqual({
+			id: 1,
+			portBase: 8000,
+			serverName: 'Server 1',
+			isRunning: true,
+			isSourceConnected: false
+		}, result);
 	});
 
 });
 
+
 test('start server error', function(assert) {
 	var adapter = this.subject();
 
-	setupAjaxResponse('/api/servers/1/start', 'POST', serverResponses.serverStartError);
-
-	var serverId = 1;
-
-	return adapter.serverStart(serverId).then(() => {
+	return adapter.serverStart(3).then(() => {
 		assert.ok(false);
 	}, (error) => {
 		assert.ok(error);
-		assert.deepEqual(error.errors, serverResponses.serverStartError.data.errors);
 	});
 
 });
@@ -90,11 +49,15 @@ test('start server error', function(assert) {
 test('stop server success', function(assert) {
 	var adapter = this.subject();
 
-	setupAjaxResponse('/api/servers/1/stop', 'POST', serverResponses.serverStopSucess);
-
-	return adapter.serverStop(1).then((result) => {
+	return adapter.serverStop(2).then((result) => {
 		assert.ok(result);
-		assert.deepEqual(serverResponses.serverStopSucess.data, result);
+		assert.deepEqual({
+			id: 2,
+			portBase: 8002,
+			serverName: 'Server 2',
+			isRunning: false,
+			isSourceConnected: false
+		}, result);
 	});
 
 });
@@ -103,13 +66,10 @@ test('stop server success', function(assert) {
 test('stop server error', function(assert) {
 	var adapter = this.subject();
 
-	setupAjaxResponse('/api/servers/1/stop', 'POST', serverResponses.serverStopError);
-
-	return adapter.serverStop(1).then(() => {
+	return adapter.serverStop(4).then(() => {
 		assert.ok(false);
 	}, (error) => {
 		assert.ok(error);
-		assert.deepEqual(error.errors, serverResponses.serverStopError.data.errors);
 	});
 
 });
