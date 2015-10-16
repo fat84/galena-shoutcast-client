@@ -91,3 +91,46 @@ test('Stop server', function(assert) {
 	});
 });
 
+test('Delete server - Ok', function(assert) {
+
+	page.visit();
+	var firstServerPort;
+
+	page.servers(1).btnRemove().click();
+
+	andThen(function() {
+		firstServerPort= page.servers(1).port();
+		assert.ok(page.deleteDialog().btnOk().isVisible());
+		assert.ok(page.deleteDialog().btnCancel().isVisible());
+	});
+
+	page.deleteDialog().btnOk().click();
+
+	andThen(function() {
+		assert.notEqual(page.servers(1).port(), firstServerPort);
+	});
+
+});
+
+test('Delete server - Cancel', function(assert) {
+
+	page.visit();
+	var firstServerPort;
+
+	page.servers(1).btnRemove().click();
+
+	andThen(function() {
+		firstServerPort= page.servers(1).port();
+		assert.ok(page.deleteDialog().btnOk().isVisible());
+		assert.ok(page.deleteDialog().btnCancel().isVisible());
+	});
+
+	page.deleteDialog().btnCancel().click();
+
+	andThen(function() {
+		assert.equal(page.servers(1).port(), firstServerPort);
+	});
+
+});
+
+

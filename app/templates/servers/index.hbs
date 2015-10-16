@@ -16,9 +16,14 @@
 		 <button class="btn-edit">Edit</button>
 		 <button class="btn-start" {{action "serverStart" server}}>Start</button>
 		 {{/if}}
-				<button class="btn-remove">Remove</button>
+		 <button class="btn-remove" {{action "serverRemove" server}}>Remove</button>
 		</td>
 	</tr>
 	{{/each}}
 	</tbody>
 </table>
+
+{{#modal-dialog-ok-cancel title="Delete server" showDialog=deleteDialog.show ok="deleteOk"}}
+This will delete the server {{deleteDialog.server.serverName}}. Are you sure?
+{{/modal-dialog-ok-cancel}}
+

@@ -1,5 +1,6 @@
 import PageObject from '../../page-object';
 import button from '../helpers/button';
+import modalDialogOkCancel from '../components/modal-dialog-ok-cancel';
 
 let {
   visitable,
@@ -29,7 +30,9 @@ export default PageObject.build({
 			btnStop: button('.btn-stop'),
 			btnRemove: button('.btn-remove'),
 		}
-	})
+	}),
+
+	deleteDialog: modalDialogOkCancel
 });
 
 

@@ -84,5 +84,9 @@ export default function() {
 				return servers[id+1];
 		}
 	});
+	
+	this.delete('/servers/:id', function() {
+		return new Mirage.Response(204);
+	});
 }
 
